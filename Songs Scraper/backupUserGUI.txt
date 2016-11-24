@@ -1,0 +1,250 @@
+private PrintWriter printWriter;
+	 String line;
+	private java.net.URL url;
+	 Scanner input;
+	private File file;
+
+//	private URL url;
+//	private HttpURLConnection connection;
+//	BufferedReader in;
+	
+
+
+	 
+		 
+    private boolean flagRanking= false;
+	private boolean flagWriter= false;
+	private boolean flagProducer= false;
+	private boolean flagReleaseMonth= false;
+	private boolean flagReleaseYear= false;
+	private boolean flagDesc= false;
+	private boolean flagNext= false;  
+
+
+ private String strRanking= "";
+	private String strWriter= "";
+	private String strProducer= "";
+	private String strReleaseMonth= "";
+	private String strReleaseYear= "";
+	private String strDesc= "";
+	private String strNext= "";
+	
+	private Song[] songList = new Song[50];
+	private void connectToWeb(String pUrl){
+		
+		System.out.println(pUrl);
+		
+		
+		
+		try {
+			url = new java.net.URL(pUrl);
+			input = new Scanner(url.openStream());
+			
+			
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+//		try {
+//	          url = new URL(pUrl);
+//	         URLConnection urlConnection = url.openConnection();
+//	         connection = null;
+//	         if(urlConnection instanceof HttpURLConnection) {
+//	            connection = (HttpURLConnection) urlConnection;
+//	         }else {
+//	            System.out.println("Please enter an HTTP URL.");
+//	            return;
+//	         }	         	      	         	        
+//	         
+//	      }catch(IOException e) {
+//	         e.printStackTrace();
+//	      }
+	   
+	}
+
+	private String readData(){
+		
+		Song objSng;
+		String fileData ="";
+		String matched = "";
+		 while(input.hasNext()) {
+				line =  input.nextLine();
+//				if(line.contains("</strong>Art Garfunkel"))
+//					System.out.println(line);	
+				
+				matched = matchType(line);
+			 }
+		 objSng = new Song(Integer.parseInt(strRanking),strWriter,strProducer,strReleaseMonth+strReleaseYear,strNext,strDesc);
+		 songList[(50-Song.remainingObjects)-1]  = objSng;
+		 
+		 fileData = strRanking + "," + strWriter+ "," + strProducer+ "," + strReleaseMonth+strReleaseYear+ "," + strNext+ "," + strDesc;
+		 writeFile(fileData,fileName);
+		 
+		resetFlag();
+		return matched;
+//		  try {
+//			in = new BufferedReader(
+//			            new InputStreamReader(connection.getInputStream()));
+//		
+//		         String urlString = "";
+//		         String current;
+//		         
+//		         while((current = in.readLine()) != null) {
+//		        	 if(current.contains("Writers:") || current.contains("Producer:") || current.contains("Released:")){
+//		        		 urlString += current;
+//		        		 System.out.println(current);
+//		        	 }
+//		         }
+//		  } catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+	}
+	
+	private String matchType(String inText){
+		
+		String matched="";
+					
+		String patternRanking = "(?<=<h2><span>)[\\d]?\\d.";
+		String patternWriter = "(?<=Writer[s]?:[\\s]?</strong>(&#xA0;)?)[a-zA-Z,\\s]*+";
+		String patternProducer = "(?<=Producer[s]?:(&#xA0;)?[\\s]?</strong>)[a-zA-z,\\s]+"; //[\\s]*?
+		String patternReleaseMonth= "(?<=Released:[\\s]?</strong>)[\\s]*?[a-zA-Z]+";
+		String patternReleaseYear= "(?<=&apos;)[\\s]*?\\d\\d";
+		String patternDesc = "(?<=<p>).+(?=<a href=)";  //
+		String patternNext = "(?<=<li><a href=\").*?(?=\" rel=\"next)";
+			
+		if(!flagRanking){
+			matched = matchPattern(inText,patternRanking);
+			if(matched.length()>0){
+				flagRanking = true;
+				strRanking= matched.replace(".","");
+			}
+		}
+		//*******************************************************
+		if(!flagWriter){
+			matched = matchPattern(inText,patternWriter);
+			if(matched.length()>0){
+				flagWriter = true;
+				strWriter= matched.trim();
+			}
+		}
+		//*******************************************************
+		if(!flagProducer){
+			matched = matchPattern(inText,patternProducer);
+			if(matched.length()>0){
+				flagProducer = true;
+				 strProducer= matched.trim();
+			}
+		}
+		//*******************************************************
+		if(!flagReleaseMonth){
+			matched = matchPattern(inText,patternReleaseMonth);
+			if(matched.length()>0){
+				flagReleaseMonth = true;
+				strReleaseMonth=matched.trim();
+			}
+		}
+		//*******************************************************
+		if(!flagReleaseYear){
+			matched = matchPattern(inText,patternReleaseYear);
+			if(matched.length()>0){
+				flagReleaseYear = true;
+				strReleaseYear= matched.trim();
+			}
+		}	
+		//*******************************************************
+		if(!flagDesc){
+			matched = matchPattern(inText,patternDesc);
+			if(matched.length()>0){
+				flagDesc = true;
+				if(matched.length()>15)
+					strDesc= matched.substring(0, 15).trim();
+				else
+					strDesc= matched.trim();
+			}
+		}
+		//*******************************************************		
+		if(!flagNext){
+			matched = matchPattern(inText,patternNext);
+			if(matched.length()>0){
+				flagNext = true;
+				nextURL = matched;
+				strNext= matched.trim();
+			}
+		}
+				
+			return matched;	
+	}
+	
+    private String matchPattern(String inText,String strpattern){
+
+		Pattern pattern;
+		Matcher matcher;
+		String matched="";
+		
+		 pattern = Pattern.compile(strpattern);  //
+		 matcher = pattern.matcher(inText);
+		
+				while (matcher.find()){
+					System.out.println(matcher.group());
+					matched = matcher.group();
+				}
+				
+			return matched;	
+	}
+
+    private void resetFlag(){
+    	flagRanking= false;
+    	flagWriter= false;
+    	flagProducer= false;
+    	flagReleaseMonth= false;
+    	flagReleaseYear= false;
+    	flagDesc= false;
+    	flagNext= false;
+    }
+
+	public void writeFile(String trans,String outputFileName) {
+		// write/append any new transaction (purchase) data to the data.txt file
+    	
+		outputFileName = outputFileName + ".txt";
+			try {
+				
+				file = new File (outputFileName);
+	    	    printWriter = new PrintWriter (new FileOutputStream(outputFileName, true));
+
+				printWriter.println (trans);
+				
+				 printWriter.close ();   
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "The data cannot be written to the File");
+			}
+    	    
+    	       
+	}
+
+
+	//***********************
+		
+//		Pattern pattern;
+//		Matcher matcher;
+//		String matched="";
+//		
+//		 pattern = Pattern.compile("(?<=Producer[s]?:(&#xA0;)?</strong>)[a-zA-z,\\s]+");  //
+//		 matcher = pattern.matcher("<p><strong>Writer:</strong> Paul Simon <br><strong>Producers:&#xA0;</strong>Art Garfunkel, Roy Halee, Simon <br><strong>Released:</strong> Feb. &apos;70, Columbia");
+//		
+//				while (matcher.find()){
+//					System.out.println(matcher.group());
+//					matched = matcher.group();
+//				}
+				
+//		String test = "";
+//		if(test.matches("(?<=Producer[s]?)[</]"))  //(&#xA0;)</strong>)[a-zA-Z,\\s]*+  
+//			System.out.println(test);
+		
