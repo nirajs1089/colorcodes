@@ -1,0 +1,72 @@
+//INSERT INTO `tblreservation` (`ticketNo`, `userRef`, `showRef`, `cardInfo`, `ticketQty`, `ticketAmount`, `ticketDate`) VALUES (NULL, '1', '2', '1234567890123456', '3', '30', NOW());
+	//INSERT INTO `tbluser` (`userID`, `username`, `password`, `fullname`, `email`, `phone`) VALUES (NULL, 'shahn', 'shahnpass', 'Shah Niraj', 's@g.com', '123-456-7890');
+	//INSERT INTO `tblmovie` (`movieID`, `movieName`, `movieRank`) VALUES (NULL, 'Titanic', '1');
+	//INSERT INTO `tblshow` (`showID`, `movieRef`, `roomNo`, `showDate`, `showPrice`, `totalSeats`, `availableSeats`) VALUES (NULL, '6', '13', '2016-12-07 09:30:30', '10', '50', '45');
+	
+	//SELECT `userID`, `username`, `password`, `fullname`, `email`, `phone` FROM `tbluser` WHERE `userID` = 1
+	//SELECT `ticketNo`, `userRef`, `showRef`, `cardInfo`, `ticketQty`, `ticketAmount`, `ticketDate` FROM `tblreservation` WHERE `userRef` = 1
+	//SELECT `showID`, `movieRef`, `roomNo`, `showDate`, `totalSeats`, `availableSeats` FROM `tblshow` WHERE `movieRef` = 5
+	//SELECT `movieID`, `movieName`, `movieRank` FROM `tblmovie` WHERE `movieID` = 4
+	
+	//UPDATE `tbluser` SET `userID`=1,`username`="ss" WHERE 1
+	//UPDATE `tblreservation` SET `ticketNo`=[value-1],`userRef`=[value-2] WHERE 1
+//	UPDATE `tblshow` SET `showID`=[value-1],`movieRef`=[value-2] WHERE 1
+//	UPDATE `tblmovie` SET `movieID`=[value-1],`movieName`=[value-2]	WHERE 1	
+	
+	//DELETE FROM `tbluser` WHERE `userID`=1
+//	DELETE FROM `tblreservation` WHERE `ticketNo`= 1
+//	DELETE FROM `tblshow` WHERE `showID`= 1
+//	DELETE FROM `tblmovie` WHERE `movieID`=1	
+
+
+**********************************************
+
+SELECT `movieID`, `movieName`, `movieRank` FROM `tblmovie` WHERE `movieID` NOT in (SELECT `movieRef`FROM `tblshow`)
+SELECT COUNT(*) FROM `tblmovie` WHERE `movieID` NOT in (SELECT `movieRef`FROM `tblshow`)
+
+SELECT * FROM `tblshow` WHERE `showID` NOT in (SELECT `showRef`FROM `tblreservation`)
+SELECT COUNT(*) FROM `tblshow` WHERE `showID` NOT in (SELECT `showRef`FROM `tblreservation`)
+
+SELECT * FROM `tblreservation` WHERE `userRef` = 1
+SELECT COUNT(*) FROM `tblreservation` WHERE `userRef` = 1
+
+Datediff
+SELECT CURDATE();
+SELECT DATE('2016-11-27 16:19:25');
+SELECT DATEDIFF(CURDATE(),DATE('2016-11-27 16:19:25'));
+
+SELECT CURTIME();        //gets current time
+SELECT HOUR('10:05:03');  
+
+
+SELECT HOUR(CURTIME());
+SELECT HOUR(TIME('2016-11-27 16:19:25'));
+SELECT MINUTE(TIMEDIFF(CURTIME(),TIME('2016-12-11 22:30:00')));
+
+*****************************************
+
+SELECT * FROM `tblreservation` WHERE 
+DATEDIFF(CURDATE(),DATE(ticketDate)) = 0
+AND HOUR(TIMEDIFF(CURTIME(),TIME(ticketDate))) <> 0
+AND MINUTE(CURTIME()) > MINUTE(TIME(ticketDate))
+
+SELECT * FROM `tblreservation` WHERE
+`userRef` = 14 AND
+DATEDIFF(CURDATE(),DATE(ticketDate)) = 0
+AND HOUR(TIMEDIFF(CURTIME(),TIME(ticketDate))) <> 0
+AND MINUTE(CURTIME()) > MINUTE(TIME(ticketDate))
+
+
+SELECT DATEDIFF(CURDATE(),DATE('2016-11-27 16:19:25')); 
+
+SELECT MINUTE(TIMEDIFF(CURTIME(),TIME('2016-12-11 22:30:00')));
+
+
+SELECT * FROM `tblreservation` WHERE `showRef` NOT IN (SELECT `showID`FROM `tblshow` where (DATEDIFF(CURDATE(),DATE(showDate)) = 0 AND HOUR(TIMEDIFF(CURTIME(),TIME(showDate))) = 0 AND MINUTE(CURTIME()) > MINUTE(TIME(showDate))))
+
+
+
+
+
+
+
